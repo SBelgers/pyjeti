@@ -1,0 +1,106 @@
+{
+    "0x00": {
+        "name": "JETI_SUCCESS",
+        "description": "no error occurred"
+    },
+    "0x02": {
+        "name": "JETI_ERROR_OPEN_PORT",
+        "description": "could not open COM port"
+    },
+    "0x03": {
+        "name": "JETI_ERROR_PORT_SETTING",
+        "description": "could not set COM port settings"
+    },
+    "0x04": {
+        "name": "JETI_ERROR_BUFFER_SIZE",
+        "description": "could not set buffer size of COM port"
+    },
+    "0x05": {
+        "name": "JETI_ERROR_PURGE",
+        "description": "could not purge buffers of COM port"
+    },
+    "0x06": {
+        "name": "JETI_ERROR_TIMEOUT_SETTING",
+        "description": "could not set COM port timeout"
+    },
+    "0x07": {
+        "name": "JETI_ERROR_SEND",
+        "description": "could not send to device"
+    },
+    "0x08": {
+        "name": "JETI_TIMEOUT",
+        "description": "communication timeout error"
+    },
+    "0x0A": {
+        "name": "JETI_ERROR_RECEIVE",
+        "description": "could not receive from device"
+    },
+    "0x0B": {
+        "name": "JETI_ERROR_NAK",
+        "description": "command not supported or invalid argument"
+    },
+    "0x0C": {
+        "name": "JETI_ERROR_CONVERT",
+        "description": "could not convert received data"
+    },
+    "0x0D": {
+        "name": "JETI_ERROR_PARAMETER",
+        "description": "invalid argument"
+    },
+    "0x0E": {
+        "name": "JETI_BUSY",
+        "description": "device busy"
+    },
+    "0x11": {
+        "name": "JETI_CHECKSUM_ERROR",
+        "description": "invalid checksum of received data"
+    },
+    "0x12": {
+        "name": "JETI_INVALID_STEPWIDTH",
+        "description": "invalid step width"
+    },
+    "0x13": {
+        "name": "JETI_INVALID_NUMBER",
+        "description": "invalid device number"
+    },
+    "0x14": {
+        "name": "JETI_NOT_CONNECTED",
+        "description": "device not connected"
+    },
+    "0x15": {
+        "name": "JETI_INVALID_HANDLE",
+        "description": "invalid device handle"
+    },
+    "0x16": {
+        "name": "JETI_INVALID_CALIB",
+        "description": "invalid calibration file number"
+    },
+    "0x17": {
+        "name": "JETI_CALIB_NOT_READ",
+        "description": "calibration data not read"
+    },
+    "0x20": {
+        "name": "JETI_OVEREXPOSURE",
+        "description": "measurement failed due to overexposure"
+    },
+    "0x22": {
+        "name": "JETI_MEASURE_FAIL",
+        "description": "measurement failed due to other reasons"
+    },
+    "0x23": {
+        "name": "JETI_ADAPTION_FAIL",
+        "description": "adaption failed"
+    },
+    "0x80": {
+        "name": "JETI_DLL_ERROR",
+        "description": "internal DLL error"
+    },
+    "0xFF": {
+        "name": "JETI_FATAL_ERROR",
+        "description": "fatal communication error"
+    },
+    "0x2710...0x2AFC": {
+        "name": "Windows sockets error codes",
+        "description": "Windows sockets error codes"
+    }
+}
