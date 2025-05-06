@@ -1,8 +1,9 @@
 import ctypes
-import numpy as np
 import time
 import platform
 import json
+import warnings
+import numpy as np
 from tqdm import tqdm
 
 with open("jeti_error_codes.json", "r") as file:
@@ -11,10 +12,13 @@ with open("jeti_error_codes.json", "r") as file:
 
 class Spectrometer:
     def __init__(
-        self, radio_ex_dll_path: str = "jeti_drivers/Win64/jeti_radio_ex64.dll"
+        self,
+        radio_ex_dll_path: str = "jeti_drivers/Win64/jeti_radio_ex64.dll",
+        simulate: bool = False,
     ):
         self.dll = ctypes.WinDLL(radio_ex_dll_path)
         self.device_handle = None
+        self.simulate = simulate
 
     def __enter__(self):
         self.open()
@@ -49,6 +53,9 @@ class Spectrometer:
         return num_devices.value
 
     def validate_device_id(self, device_id: int) -> bool:
+        if self.simulate:
+            warnings.warn("Simulated mode: No device ID validation performed.")
+            return True
         num_devices = self.count_connected_devices()
         if device_id < 0 or device_id >= num_devices:
             raise Exception(
@@ -57,6 +64,13 @@ class Spectrometer:
         return True
 
     def get_serial(self, device_id: int = 0) -> dict[str, str]:
+        if self.simulate:
+            warnings.warn("Simulated mode: Serial is not real.")
+            return {
+                "board_serial": "-1",
+                "spec_serial": "-1",
+                "device_serial": "-1",
+            }
         self.validate_device_id(device_id)
 
         board_serial = ctypes.create_string_buffer(256)
@@ -83,6 +97,11 @@ class Spectrometer:
             )
 
     def open(self, device_id: int = 0) -> None:
+        if self.simulate:
+            warnings.warn("Simulated mode: No device opened.")
+            self.device_handle = ctypes.c_ulonglong(0)
+            return
+
         self.validate_device_id(device_id)
 
         self.device_handle = ctypes.c_ulonglong()
@@ -92,11 +111,19 @@ class Spectrometer:
         self._validate_status(status)
 
     def close(self) -> None:
+        if self.simulate:
+            warnings.warn("Simulated mode: No device to close.")
+            self.device_handle = None
+            return
         if self.device_handle:
             self.dll.JETI_CloseRadioEx(self.device_handle)
             self.device_handle = None
 
     def _prepare_measurement(self, integration_time_ms=0, averaging=1, step_nm=1):
+        if self.simulate:
+            warnings.warn("Simulated mode: No measurement preparation.")
+            return 0
+
         if not self.device_handle:
             raise Exception("Device not opened.")
 
@@ -114,6 +141,16 @@ class Spectrometer:
     def measure(
         self, integration_time_ms: int = 0, averaging: int = 1, step_nm: int = 1
     ) -> np.ndarray:
+        if self.simulate:
+            warnings.warn("Simulated mode: No measurement performed.")
+            start_wavelength = 380
+            end_wavelength = 780
+            num_values = int((end_wavelength - start_wavelength) / step_nm) + 1
+            wl = np.arange(start_wavelength, end_wavelength + step_nm, step_nm)
+            spectrum = np.random.rand(num_values).astype(np.float32)
+            spd = np.vstack((wl, spectrum))
+            return spd
+
         if not self.device_handle:
             raise Exception("Device not opened.")
         if integration_time_ms == 0:
