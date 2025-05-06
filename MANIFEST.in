@@ -1,0 +1,4 @@
+
+include pyjeti/jeti_error_codes.json
+
+recursive-include pyjeti/jeti_drivers *

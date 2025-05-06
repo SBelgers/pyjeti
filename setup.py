@@ -5,13 +5,5 @@ setup(
     version="0.1",
     packages=["pyjeti"],
     install_requires=["tqdm", "numpy"],
-    package_data={
-        "pyjeti": [
-            "jeti_drivers\Win32\jeti_spectro_ex.dll",
-            "jeti_drivers\Win32\Lib\jeti_radio_ex.lib",
-            "jeti_drivers\Win64\jeti_spectro_ex64.dll",
-            "jeti_drivers\Win64\Lib\jeti_radio_ex64.lib",
-            "jeti_error_codes.json",
-        ]
-    },
+    include_package_data=True,
 )
