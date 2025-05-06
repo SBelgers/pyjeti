@@ -158,7 +158,7 @@ class Spectrometer:
             end_wavelength = 780
             num_values = int((end_wavelength - start_wavelength) / step_nm) + 1
             wl = np.arange(start_wavelength, end_wavelength + step_nm, step_nm)
-            spectrum = np.random.rand(num_values).astype(np.float32)
+            spectrum = np.random.rand(num_values).astype(np.float32) / 1000
             spd = np.vstack((wl, spectrum))
             return spd
 
