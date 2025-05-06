@@ -15,7 +15,7 @@ with open("jeti_error_codes.json", "r") as file:
 class Spectrometer:
     def __init__(
         self,
-        radio_ex_dll_path: Optional[str] = "jeti_drivers/Win64/jeti_radio_ex64.dll",
+        radio_ex_dll_path: Optional[str] = None,
         simulate: bool = False,
     ):
         self._load_dll(radio_ex_dll_path)
