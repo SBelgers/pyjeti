@@ -5,6 +5,8 @@ import json
 import warnings
 import numpy as np
 from tqdm import tqdm
+import importlib.resources
+from typing import Optional
 
 with open("jeti_error_codes.json", "r") as file:
     _ERROR_CODES = json.load(file)
@@ -13,10 +15,16 @@ with open("jeti_error_codes.json", "r") as file:
 class Spectrometer:
     def __init__(
         self,
-        radio_ex_dll_path: str = "jeti_drivers/Win64/jeti_radio_ex64.dll",
+        radio_ex_dll_path: Optional[str] = "jeti_drivers/Win64/jeti_radio_ex64.dll",
         simulate: bool = False,
     ):
-        self.dll = ctypes.WinDLL(radio_ex_dll_path)
+        if radio_ex_dll_path is not None:
+            self.dll = ctypes.WinDLL(radio_ex_dll_path)
+        else:
+            with importlib.resources.files(__package__).joinpath(
+                "jeti_drivers/Win64/jeti_radio_ex64.dll"
+            ) as radio_ex_dll_path:
+                self.dll = ctypes.WinDLL(radio_ex_dll_path)
         self.device_handle = None
         self.simulate = simulate
 
