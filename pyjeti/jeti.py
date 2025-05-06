@@ -8,7 +8,7 @@ from tqdm import tqdm
 import importlib.resources
 from typing import Optional
 
-with importlib.resources.path("jeti_error_codes.json") as path:
+with importlib.resources.files(__package__).joinpath("jeti_error_codes.json") as path:
     with open(path, "r") as file:
         _ERROR_CODES = json.load(file)
 
@@ -47,12 +47,12 @@ class Spectrometer:
             self.dll = ctypes.WinDLL(path)
             return
         if platform.architecture()[0] == "64bit":
-            with importlib.resources.path(
+            with importlib.resources.files(__package__).joinpath(
                 "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
             ) as dll_path:
                 self.dll = ctypes.WinDLL(dll_path)
         elif platform.architecture()[0] == "32bit":
-            with importlib.resources.path(
+            with importlib.resources.files(__package__).joinpath(
                 "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
             ) as dll_path:
                 self.dll = ctypes.WinDLL(dll_path)
