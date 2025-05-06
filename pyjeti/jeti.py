@@ -48,12 +48,12 @@ class Spectrometer:
             return
         if platform.architecture()[0] == "64bit":
             with importlib.resources.files(__package__).joinpath(
-                "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
+                "jeti_drivers\Win64\jeti_spectro_ex64.dll"
             ) as dll_path:
                 self.dll = ctypes.WinDLL(dll_path)
         elif platform.architecture()[0] == "32bit":
             with importlib.resources.files(__package__).joinpath(
-                "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
+                "jeti_drivers\Win64\jeti_spectro_ex64.dll"
             ) as dll_path:
                 self.dll = ctypes.WinDLL(dll_path)
 
