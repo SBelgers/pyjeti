@@ -18,13 +18,7 @@ class Spectrometer:
         radio_ex_dll_path: Optional[str] = "jeti_drivers/Win64/jeti_radio_ex64.dll",
         simulate: bool = False,
     ):
-        if radio_ex_dll_path is not None:
-            self.dll = ctypes.WinDLL(radio_ex_dll_path)
-        else:
-            with importlib.resources.files(__package__).joinpath(
-                "jeti_drivers/Win64/jeti_radio_ex64.dll"
-            ) as radio_ex_dll_path:
-                self.dll = ctypes.WinDLL(radio_ex_dll_path)
+        self._load_dll(radio_ex_dll_path)
         self.device_handle = None
         self.simulate = simulate
 
@@ -47,12 +41,20 @@ class Spectrometer:
         self._validate_status(status)
         return (major_version.value, minor_version.value, build_number.value)
 
-    def _load_dll(self):
-        if platform.architecture()[0] == "64bit" and "64" not in self.dll_path:
-            raise OSError("64-bit Python interpreter requires a 64-bit DLL.")
-        elif platform.architecture()[0] == "32bit" and "64" in self.dll_path:
-            raise OSError("32-bit Python interpreter requires a 32-bit DLL.")
-        self.dll = ctypes.WinDLL(self.dll_path)
+    def _load_dll(self, path: str) -> None:
+        if path is not None:
+            self.dll = ctypes.WinDLL(path)
+            return
+        if platform.architecture()[0] == "64bit":
+            with importlib.resources.path(
+                "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
+            ) as dll_path:
+                self.dll = ctypes.WinDLL(dll_path)
+        elif platform.architecture()[0] == "32bit":
+            with importlib.resources.path(
+                "pyjeti\jeti_drivers\Win64\jeti_spectro_ex64.dll"
+            ) as dll_path:
+                self.dll = ctypes.WinDLL(dll_path)
 
     def count_connected_devices(self) -> int:
         num_devices = ctypes.c_ulong()
