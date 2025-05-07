@@ -8,9 +8,11 @@ from tqdm import tqdm
 import importlib.resources
 from typing import Optional
 
-with importlib.resources.files(__package__).joinpath("jeti_error_codes.json") as path:
-    with open(path, "r") as file:
-        _ERROR_CODES = json.load(file)
+_ERROR_CODES_PATH = importlib.resources.files(__package__).joinpath(
+    "jeti_error_codes.json"
+)
+with open(_ERROR_CODES_PATH, "r") as file:
+    _ERROR_CODES = json.load(file)
 
 
 class Spectrometer:
