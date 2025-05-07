@@ -49,15 +49,15 @@ class Spectrometer:
             self.dll = ctypes.WinDLL(path)
             return
         if platform.architecture()[0] == "64bit":
-            with importlib.resources.files(__package__).joinpath(
+            dll_path = importlib.resources.files(__package__).joinpath(
                 "jeti_drivers\Win64\jeti_spectro_ex64.dll"
-            ) as dll_path:
-                self.dll = ctypes.WinDLL(dll_path)
+            )
+            self.dll = ctypes.WinDLL(dll_path)
         elif platform.architecture()[0] == "32bit":
-            with importlib.resources.files(__package__).joinpath(
+            dll_path = importlib.resources.files(__package__).joinpath(
                 "jeti_drivers\Win64\jeti_spectro_ex64.dll"
-            ) as dll_path:
-                self.dll = ctypes.WinDLL(dll_path)
+            )
+            self.dll = ctypes.WinDLL(dll_path)
 
     def count_connected_devices(self) -> int:
         num_devices = ctypes.c_ulong()
