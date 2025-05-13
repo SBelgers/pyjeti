@@ -40,4 +40,4 @@ with Spectrometer() as jeti:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/SBelgers/pyjeti/blob/main/LICENSE) file for details.
+To be included; Python code will be MIT Licensed, but the included jeti_drivers need to comply to derived licenses. 
