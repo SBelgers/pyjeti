@@ -16,11 +16,29 @@ with open(_ERROR_CODES_PATH, "r") as file:
 
 
 class Spectrometer:
+    """
+    A class to interface with the JETI spectrometer devices.
+
+    This class provides methods to interact with JETI spectrometers, including
+    opening and closing connections, retrieving device information, and performing
+    spectral measurements.
+    """
+
     def __init__(
         self,
         radio_ex_dll_path: Optional[str] = None,
         simulate: bool = False,
-    ):
+    ) -> None:
+        """
+        Initialize the Spectrometer instance.
+
+        Args:
+            radio_ex_dll_path (Optional[str], optional): Path to the JETI RadioEx DLL.
+            If None, the default path based on the system architecture will be used.
+            Defaults to None.
+            simulate (bool, optional): If True, enables simulation mode where no actual
+                hardware interaction occurs. Defaults to False.
+        """
         self._load_dll(radio_ex_dll_path)
         self.device_handle = None
         self.simulate = simulate
@@ -33,6 +51,13 @@ class Spectrometer:
         self.close()
 
     def get_dll_version(self) -> tuple[str, str, str]:
+        """
+        Retrieve the version of the JETI RadioEx DLL.
+
+        Returns:
+            tuple[str, str, str]: A tuple containing the major version, minor version,
+                and build number of the DLL.
+        """
         major_version = ctypes.c_ushort()
         minor_version = ctypes.c_ushort()
         build_number = ctypes.c_ushort()
@@ -60,12 +85,30 @@ class Spectrometer:
             self.dll = ctypes.WinDLL(dll_path)
 
     def count_connected_devices(self) -> int:
+        """
+        Count the number of connected JETI spectrometer devices.
+
+        Returns:
+            int: The number of connected devices.
+        """
         num_devices = ctypes.c_ulong()
         status = self.dll.JETI_GetNumRadioEx(ctypes.byref(num_devices))
         self._validate_status(status)
         return num_devices.value
 
     def validate_device_id(self, device_id: int) -> bool:
+        """
+        Validate the provided device ID.
+
+        Args:
+            device_id (int): The ID of the device to validate.
+
+        Raises:
+            Exception: If the device ID is invalid or out of range.
+
+        Returns:
+            bool: True if the device ID is valid, False otherwise.
+        """
         if self.simulate:
             warnings.warn("Simulated mode: No device ID validation performed.")
             return True
@@ -77,6 +120,18 @@ class Spectrometer:
         return True
 
     def get_serial(self, device_id: int = 0) -> dict[str, str]:
+        """
+        Get the serial numbers of the connected JETI spectrometer devices.
+
+        If the spectrometer is in simulation mode, it returns placeholder serial numbers.
+
+        Args:
+            device_id (int, optional): The ID of the device. Defaults to 0.
+
+        Returns:
+            dict[str, str]: A dictionary containing the serial numbers of the board,
+                spectrometer, and device.
+        """
         if self.simulate:
             warnings.warn("Simulated mode: Serial is not real.")
             return {
@@ -101,6 +156,16 @@ class Spectrometer:
         }
 
     def _validate_status(self, status: int) -> None:
+        """
+        Validates the status code returned by an operation and raises an exception if the status indicates an error.
+
+        Args:
+            status (int): The status code to validate. A value of 0 indicates success, while any other value indicates an error.
+
+        Raises:
+            Exception: If the status code is not 0, an exception is raised with details about the error, including the error code,
+                error name, and description retrieved from the `_ERROR_CODES` dictionary.
+        """
         if status != 0:
             formatted_status = f"0x{status:02X}"
             error_info = _ERROR_CODES.get(formatted_status)
@@ -110,6 +175,15 @@ class Spectrometer:
             )
 
     def open(self, device_id: int = 0) -> None:
+        """
+        Opens a connection to the device with the specified device ID.
+
+        Args:
+            device_id (int, optional): The ID of the device to open. Defaults to 0.
+        Notes:
+            If `simulate` mode is enabled, no actual device will be opened, and a warning will be issued.
+
+        """
         if self.simulate:
             warnings.warn("Simulated mode: No device opened.")
             self.device_handle = ctypes.c_ulonglong(0)
@@ -124,6 +198,9 @@ class Spectrometer:
         self._validate_status(status)
 
     def close(self) -> None:
+        """
+        Closes the connection to the device.
+        """
         if self.simulate:
             warnings.warn("Simulated mode: No device to close.")
             self.device_handle = None
@@ -132,7 +209,25 @@ class Spectrometer:
             self.dll.JETI_CloseRadioEx(self.device_handle)
             self.device_handle = None
 
-    def _prepare_measurement(self, integration_time_ms=0, averaging=1, step_nm=1):
+    def _prepare_measurement(
+        self, integration_time_ms: int = 0, averaging: int = 1, step_nm: int = 1
+    ) -> int:
+        """
+        Prepares the measurement settings for the device.
+        This method configures the device with the specified integration time,
+        averaging, and step size for measurements.
+
+        Args:
+            integration_time_ms (int, optional): The integration time in milliseconds. Defaults to 0.
+            averaging (int, optional): The number of measurements to average. Defaults to 1.
+            step_nm (int, optional): The step size in nanometers. Defaults to 1.
+
+        Raises:
+            Exception: If the device is not opened or the preparation fails.
+
+        Returns:
+            int: Status code returned by the device after preparation.
+        """
         if self.simulate:
             warnings.warn("Simulated mode: No measurement preparation.")
             return 0
@@ -154,6 +249,31 @@ class Spectrometer:
     def measure(
         self, integration_time_ms: int = 0, averaging: int = 1, step_nm: int = 1
     ) -> np.ndarray:
+        """
+        Perform a spectral measurement using the JETI device.
+        This method measures the spectral power distribution (SPD) of light
+        using the JETI spectroradiometer. It supports both simulated and
+        real measurement modes. In simulated mode, random spectral data is
+        generated.
+
+        Args:
+            integration_time_ms (int, optional): Integration time for the measurement
+                in milliseconds. If set to 0, the integration time is automatically
+                determined. Defaults to 0.
+            averaging (int, optional): Number of measurements to average for noise
+                reduction. Defaults to 1.
+            step_nm (int, optional): Wavelength step size in nanometers. Determines
+                the resolution of the measurement. Defaults to 1.
+
+        Raises:
+            Exception: If the device is not opened or if an error occurs during
+                the measurement process.
+
+        Returns:
+            np.ndarray: A 2D array where the first row contains the wavelengths
+                and the second row contains the corresponding spectral irradiance
+                values.
+        """
         if self.simulate:
             warnings.warn("Simulated mode: No measurement performed.")
             start_wavelength = 380
@@ -203,6 +323,19 @@ class Spectrometer:
     def _measuring_block(
         self, integration_time_ms: int = 0, timeout_ms: int = 240000
     ) -> None:
+        """
+        Monitors the measurement process of the device, updating progress bars for timeout
+        and expected duration, and raises an exception if the operation times out.
+
+        Args:
+            integration_time_ms (int, optional): The expected duration of the measurement
+                in milliseconds. Defaults to 0.
+            timeout_ms (int, optional): The maximum time to wait for the measurement to
+                complete in milliseconds. Defaults to 240000.
+
+        Raises:
+            Exception: If the measurement process exceeds the specified timeout.
+        """
         is_busy = ctypes.c_int()
         start_time = time.time()
         with (
@@ -229,7 +362,17 @@ class Spectrometer:
                     min(elapsed_time, integration_time_ms) - duration_bar.n
                 )
 
-    def _get_integration_time(self):
+    def _get_integration_time(self) -> float:
+        """
+        Retrieves the integration time of the connected device.
+
+
+        Raises:
+            Exception: If the device is not opened or accessible.
+
+        Returns:
+            float: The integration time of the device in seconds
+        """
         if not self.device_handle:
             raise Exception("Device not opened.")
         integration_time = ctypes.c_float()
@@ -238,22 +381,3 @@ class Spectrometer:
         )
         self._validate_status(status)
         return integration_time.value
-
-
-# Usage example
-if __name__ == "__main__":
-    with Spectrometer() as jeti:
-        version = jeti.get_dll_version()
-        print(f"JETI Radiometer DLL Version: {version[0]}.{version[1]}.{version[2]}")
-
-        connected_devices = jeti.count_connected_devices()
-        print(f"connected devices: {connected_devices}")
-
-        serial_numbers = jeti.get_serial()
-        print(f"Board Serial: {serial_numbers['board_serial']}")
-        print(f"Spectrometer Serial: {serial_numbers['spec_serial']}")
-        print(f"Device Serial: {serial_numbers['device_serial']}")
-
-        spd = jeti.measure()
-        print("Spectral Power Distribution (SPD):")
-        print(spd)
