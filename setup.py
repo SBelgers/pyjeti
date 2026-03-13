@@ -1,9 +1,6 @@
+# All package metadata is in pyproject.toml.
+# This file exists only for editable-install compatibility with older pip versions.
 from setuptools import setup
 
-setup(
-    name="pyjeti",
-    version="0.1",
-    packages=["pyjeti"],
-    install_requires=["tqdm", "numpy"],
-    include_package_data=True,
-)
+setup()
+

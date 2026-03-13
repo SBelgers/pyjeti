@@ -73,16 +73,30 @@ class Spectrometer:
         if path is not None:
             self.dll = ctypes.WinDLL(path)
             return
-        if platform.architecture()[0] == "64bit":
-            dll_path = importlib.resources.files(__package__).joinpath(
-                "jeti_drivers\\Win64\\jeti_radio_ex64.dll"
-            )
-            self.dll = ctypes.WinDLL(dll_path)
-        elif platform.architecture()[0] == "32bit":
-            dll_path = importlib.resources.files(__package__).joinpath(
-                "jeti_drivers\\Win64\\jeti_radio_ex.dll"
-            )
-            self.dll = ctypes.WinDLL(dll_path)
+
+        arch = platform.architecture()[0]
+        if arch == "64bit":
+            dll_name = "jeti_radio_ex64.dll"
+            sub = "Win64"
+        else:
+            dll_name = "jeti_radio_ex.dll"
+            sub = "Win32"
+
+        dll_path = importlib.resources.files(__package__).joinpath(
+            f"jeti_drivers\\{sub}\\{dll_name}"
+        )
+        try:
+            self.dll = ctypes.WinDLL(str(dll_path))
+        except OSError as exc:
+            raise OSError(
+                f"Could not load the JETI RadioEx DLL ({dll_name}).\n"
+                "To fix this, either:\n"
+                "  1. Pass the path to your DLL via Spectrometer(radio_ex_dll_path=...).\n"
+                "  2. Install the FTDI D2XX USB driver from "
+                "https://ftdichip.com/drivers/d2xx-drivers/ if it is missing "
+                "(the JETI DLL depends on it).\n"
+                f"Original error: {exc}"
+            ) from exc
 
     def count_connected_devices(self) -> int:
         """

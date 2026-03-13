@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "pyjeti"
+version = "0.1.0"
+description = "Python interface for the JETI specbos 1201 and 1211 spectroradiometers"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "S. Belgers" },
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "tqdm",
+]
+keywords = [
+    "jeti",
+    "specbos",
+    "spectrometer",
+    "spectroradiometer",
+    "colorimetry",
+    "photometry",
+    "radiometry",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage = "https://github.com/SBelgers/pyjeti"
+"Bug Tracker" = "https://github.com/SBelgers/pyjeti/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyjeti*"]
+
+[tool.setuptools.package-data]
+pyjeti = [
+    "jeti_error_codes.json",
+    "jeti_drivers/license.txt",
+    "jeti_drivers/Win64/*.dll",
+    "jeti_drivers/Win32/*.dll",
+]

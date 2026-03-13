@@ -1,4 +1,6 @@
 
+include LICENSE
+include README.md
 include pyjeti/jeti_error_codes.json
-
-recursive-include pyjeti/jeti_drivers *
+include pyjeti/jeti_drivers/license.txt
+recursive-include pyjeti/jeti_drivers *.dll
