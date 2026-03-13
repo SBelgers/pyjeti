@@ -47,15 +47,15 @@ class Spectrometer:
         self.open()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self):
         self.close()
 
-    def get_dll_version(self) -> tuple[str, str, str]:
+    def get_dll_version(self) -> tuple[int, int, int]:
         """
         Retrieve the version of the JETI RadioEx DLL.
 
         Returns:
-            tuple[str, str, str]: A tuple containing the major version, minor version,
+            tuple[int, int, int]: A tuple containing the major version, minor version,
                 and build number of the DLL.
         """
         major_version = ctypes.c_ushort()
@@ -69,7 +69,7 @@ class Spectrometer:
         self._validate_status(status)
         return (major_version.value, minor_version.value, build_number.value)
 
-    def _load_dll(self, path: str) -> None:
+    def _load_dll(self, path: Optional[str] = None) -> None:
         if path is not None:
             self.dll = ctypes.WinDLL(path)
             return
@@ -188,7 +188,7 @@ class Spectrometer:
                 f"Error: {formatted_status} ({error_info['name']} - {error_info['description']})"
             )
 
-    def open(self, device_id: int = 0) -> None:
+    def open(self, device_id: Optional[int] = 0) -> None:
         """
         Opens a connection to the device with the specified device ID.
 
@@ -203,11 +203,11 @@ class Spectrometer:
             self.device_handle = ctypes.c_ulonglong(0)
             return
 
-        self.validate_device_id(device_id)
-
         self.device_handle = ctypes.c_ulonglong()
         if device_id is None:
             device_id = 0
+
+        self.validate_device_id(device_id)
         status = self.dll.JETI_OpenRadioEx(device_id, ctypes.byref(self.device_handle))
         self._validate_status(status)
 
@@ -316,7 +316,7 @@ class Spectrometer:
         )
 
         self._validate_status(status)
-        self._measuring_block(integration_time_est)
+        self._measuring_block(int(integration_time_est))
 
         start_wavelength = 380
         end_wavelength = 780
